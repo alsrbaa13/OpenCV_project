@@ -4,24 +4,19 @@ import numpy as np
 def nothing(x):
     pass
 
-img = cv2.imread('images.png')
-cv2.namedWindow('image')
-zoom2 = cv2.resize(img, None, fx=1, fy=1, interpolation=cv2.INTER_CUBIC)
+img = cv2.imread('images.png',cv2.IMREAD_COLOR)
+cv2.namedWindow('zoom image')
 
-cv2.createTrackbar('zoom', 'image',0,2,nothing)
-#num = cv2.getTrackbarPos('zoom','image')
-#cv2.imread('imag',img)
+cv2.createTrackbar('zoom', 'zoom image',0,2,nothing)
+cv2.setTrackbarPos('zoom','zoom image',1)
+
 while(1):
-	cv2.imshow('image',zoom2)
 
-	k = cv2.waitKey(1) & 0xFF
-    if k == 27:
-        break
+	num = cv2.getTrackbarPos('zoom','image')
+	cv2.imshow('zoom image',img)
 
-	#print(num)
-	#zoom2 = cv2.resize(img, None, fx=num, fy=num, interpolation=cv2.INTER_CUBIC)
-    
-    
-
+	print(num)
+	if cv2.waitKey(1) & 0xFF == ord('q'):  
+		break;
 
 cv2.destroyAllWindows()
