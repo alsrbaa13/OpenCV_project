@@ -1,11 +1,15 @@
 import xml.etree.ElementTree as ET
+import sys
+import numpy
 
-def getMusicSheet(tempo):
+def getMusicSheet(name, tempo):
 
 	Music = [] #include chord and pitch
 	Sheet = [] #include time
+	note_length = ["whole", "half", "quarter", "eighth", "16th", "32nd", "64th"]
 
-	doc = ET.parse('Hes_a_pirate.mscx')
+
+	doc = ET.parse(name)
 
 	root = doc.getroot() #load xml
 
@@ -15,6 +19,7 @@ def getMusicSheet(tempo):
 	code = 0x00
 	pitch = 0
 	time = 0
+	tempo = int(tempo)
 
 	for child in root.iter():
 
@@ -23,11 +28,11 @@ def getMusicSheet(tempo):
 			print("Measure: ",child.get("number"))
 			num = num+1
 
-		if child.findtext("Chord") is not None:
+		if child.tag == "Chord" is not None:
 			print("chord")
-			code = code + 0x10
+			code = code + 0x80
 
-		elif child.findtext("Rest") is not None:
+		elif child.tag == "Rest" is not None:
 			print("rest")
 			code = code + 0x00		
 
@@ -42,16 +47,13 @@ def getMusicSheet(tempo):
 		if child.findtext("durationType") is not None:
 			print("durationType: ",child.findtext("durationType"))
 			i = child.findtext("durationType")
-			if i == 'quarter':
-				time = tempo / 4
-			elif i == 'half':
-				time = tempo / 2
-			elif i == 'eighth':
-				time = tempo / 8
-			else:
-				time = tempo
+			if i == "measure":
+				i = "whole"
+			time = tempo / pow(2, note_length.index(i))
+			if child.findtext("dots") is not None:
+				time *= 1.5
 			print("second: ", time)
-			Sheet.append(time)
+			Sheet.append(int(round(time * 1000, 4)))
 
 	file = open("D:/download/microprocess_teamproject/sheet.txt", 'w')
 	
@@ -70,7 +72,12 @@ def getMusicSheet(tempo):
 	file.close()
 
 if __name__ == "__main__":
-	tempo = int(input("enter the tempo: "))
-	print(type(tempo))
-	getMusicSheet(tempo)
+	
+	if len(sys.argv) is 1:
+  		print("you enter few option")
+  		print("1. file name, 2.song's tempo")
+
+	name = sys.argv[1]
+	tempo = sys.argv[2]
+	getMusicSheet(name, tempo)
 	
